@@ -261,7 +261,7 @@ void setDigitLCD( uint8_t digit, uint8_t position ) {
 	}
 	else if( digit == 0x09 ) {
 		LCD->WF8B[ LCD_Front_Pin[position]   ] =
-			(LCD_SEG_F | LCD_SEG_G);
+			(LCD_SEG_D | LCD_SEG_F | LCD_SEG_G);
 		LCD->WF8B[ LCD_Front_Pin[position+1] ] =
 			(LCD_SEG_A | LCD_SEG_B | LCD_SEG_C | H);
 	}
