@@ -366,8 +366,7 @@ void setTimeLCD( timeStruct *time ) {
 void errorLCD( uint8_t code ) {
 	uint8_t position = 1;
 	
-	offDotLCD( LCD_MASK_DOT_ALL & ~LCD_MASK_DOT3 );
-	onDotLCD( LCD_MASK_DOT3 );
+	clearLCD();
 	
 	//position = 1;
 	LCD->WF8B[ LCD_Front_Pin[((2*position)-2)] ] = (
@@ -401,6 +400,8 @@ void errorLCD( uint8_t code ) {
 		LCD->WF8B[ LCD_Front_Pin[((2*position)-1)] ] =
 			LCD_CLEAR;
 	}
+	
+	onDotLCD( LCD_MASK_DOT3 );
 }
 
 
