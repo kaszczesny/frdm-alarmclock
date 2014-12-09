@@ -81,4 +81,7 @@ void onDotLCD( uint8_t dot );
 //wylacza kropke/dwukropek (moze przyjac sume masek)
 void offDotLCD( uint8_t dot );
 
+//czysci caly ekran
+void clearLCD(void);
+
 #endif

@@ -327,9 +327,12 @@ void setNumberLCD( uint32_t number, uint8_t base ) {
 			setDigitLCD( number % base, i );
 			number /= base;
 			//at least 1 digit has been displayed
-			if( clear && number == 0 )
+			if( clear && number == 0 ) {
+				i--; //get to next digit
 				for( ; i>=1; i--)
 					setDigitLCD( 0xFF, i);
+				break;
+			}
 		}
 	}
 			
@@ -432,4 +435,12 @@ void offDotLCD( uint8_t dot ) {
 		LCD->WF8B[LCD_FRONT5_PIN] &= ~LCD_SEG_H;
 	if( dot & LCD_MASK_COLON )
 		LCD->WF8B[LCD_FRONT7_PIN] &= ~LCD_SEG_H;
+}
+
+void clearLCD(void) {
+	setDigitLCD( 0xFF, 1 );
+	setDigitLCD( 0xFF, 2 );
+	setDigitLCD( 0xFF, 3 );
+	setDigitLCD( 0xFF, 4 );
+	offDotLCD( LCD_MASK_DOT_ALL );
 }
