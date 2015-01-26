@@ -423,11 +423,6 @@
               <FileType>1</FileType>
               <FilePath>.\LCD.c</FilePath>
             </File>
-            <File>
-              <FileName>RTC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\RTC.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

@@ -1,7 +1,6 @@
 #include "MKL46Z4.h"
 #include "LED.h"
 #include "LCD.h"
-#include "RTC.h"
 
 int main(void){
 	

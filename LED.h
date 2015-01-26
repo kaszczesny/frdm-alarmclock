@@ -22,7 +22,4 @@ void onLED( uint32_t color );
 //gasi diode (moze przyjac sume masek)
 void offLED( uint32_t color );
 
-//wylacza taktowanie portow dla oszczednosci energii
-void unsetLED(void);
-
 #endif

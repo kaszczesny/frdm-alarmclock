@@ -27,40 +27,27 @@ void initLED(void) {
 }
 
 /*
- * magiczna wlasnosc kodu:
- *   wedlug mnie w onLED powinno byc PSOR, a w offLED PCOR, ale wtedy nie dziala :(
- *   podobnie warunki w on/off/toggleLED powinny byc raczej "if( color & LED_MASK_COLOR )
+ * magiczna wlasnosc kodu - wedlug mnie w onLED powinno byc PSOR, a w offLED PCOR, ale wtedy nie dziala :(
  * no ale co ja bede dyskutowac z plytka : )
  */
 
 void toggleLED( uint32_t color ) {
-	if( !(color & LED_MASK_RED) )
-		PTD->PTOR = LED_MASK_RED;
-	if( !(color & LED_MASK_GREEN) )
+	if( (color & LED_MASK_RED) )
 		PTE->PTOR = LED_MASK_GREEN;
+	if( (color & LED_MASK_GREEN) )
+		PTD->PTOR = LED_MASK_RED;
 }
 
 void onLED( uint32_t color ) {
-	if( !(color & LED_MASK_RED) )
-		PTD->PCOR = LED_MASK_RED;
-	if( !(color & LED_MASK_GREEN) )
+	if( (color & LED_MASK_RED) )
 		PTE->PCOR = LED_MASK_GREEN;
+	if( (color & LED_MASK_GREEN) )
+		PTD->PCOR = LED_MASK_RED;
 }
 
 void offLED( uint32_t color ) {
-	if( !(color & LED_MASK_RED) )
-		PTD->PSOR = LED_MASK_RED;
-	if( !(color & LED_MASK_GREEN) )
+	if( (color & LED_MASK_RED) )
 		PTE->PSOR = LED_MASK_GREEN;
-}
-
-void unsetLED(void) {
-	offLED( LED_MASK_ALL  );
-	
-	PORTD->PCR[LED_PIN_RED]   = PORT_PCR_MUX(0UL);
-	PORTE->PCR[LED_PIN_GREEN] = PORT_PCR_MUX(0UL);
-	
-	SIM->SCGC5 &= ~(
-		SIM_SCGC5_PORTD_MASK |
-		SIM_SCGC5_PORTE_MASK );
+	if( (color & LED_MASK_GREEN) )
+		PTD->PSOR = LED_MASK_RED;
 }

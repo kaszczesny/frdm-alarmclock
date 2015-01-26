@@ -2,7 +2,12 @@
 #define LCD_h
 
 #include "MKL46Z4.h"
-#include "RTC.h" //timeStruct
+
+typedef struct timeStruct {
+	uint8_t s;
+	uint8_t m;
+	uint8_t h;
+} timeStruct;
 
 //liczba pinow na plaszczyznach
 #define LCD_NUM_FRONT_PINS 8
