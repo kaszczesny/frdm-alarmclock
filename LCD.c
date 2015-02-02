@@ -10,12 +10,6 @@ const static uint8_t LCD_Front_Pin[LCD_NUM_FRONT_PINS] = {
 	LCD_FRONT5_PIN,
 	LCD_FRONT6_PIN, 
 	LCD_FRONT7_PIN };
-/*const static uint8_t LCD_Back_Pin[LCD_NUM_BACKP_PINS] = {
-	LCD_BACKP0_PIN,
-	LCD_BACKP1_PIN,
-	LCD_BACKP2_PIN,
-	LCD_BACKP3_PIN };*/
-
 
 void initLCD(void) {
 	//SIM (System Integration Module) - rejestr dajacy kontrole nad podawaniem zegara peryferiom
@@ -339,27 +333,30 @@ void setNumberLCD( uint32_t number, uint8_t base ) {
 	return;
 }
 
-void setTimeLCD( timeStruct *time ) {
+void setTimeLCD( volatile timeStruct time ) {
 	uint8_t temp;
 	
-	//inkrementuj liczniki czasu
-	if( ++(time->s) == 60 ) {
-		time->s = 0;
-		if( ++(time->m) == 60) {
-			time->m = 0;
-			time->h++;
-			time->h %= 24;
-		}
-	}
-	
-	temp = time->m;
+	temp = time.m;
 	setDigitLCD( temp % 10, 4 );
 	temp /= 10;
 	setDigitLCD( temp % 10, 3 );
-	temp = time->h;
+	temp = time.h;
 	setDigitLCD( temp % 10, 2 );
 	temp /= 10;
 	setDigitLCD( (temp) ? (temp % 10) : 0xFF, 1 ); //zabezpieczenie przed godzinami w stylu "08"
+}
+
+void setTimeSecondsLCD( volatile timeStruct time ) {
+	uint8_t temp;
+	
+	temp = time.s;
+	setDigitLCD( temp % 10, 4 );
+	temp /= 10;
+	setDigitLCD( temp % 10, 3 );
+	temp = time.m;
+	setDigitLCD( temp % 10, 2 );
+	temp /= 10;
+	setDigitLCD( temp % 10, 1 );
 }
 
 

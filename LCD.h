@@ -2,12 +2,7 @@
 #define LCD_h
 
 #include "MKL46Z4.h"
-
-typedef struct timeStruct {
-	uint8_t s;
-	uint8_t m;
-	uint8_t h;
-} timeStruct;
+#include "globals.h"
 
 //liczba pinow na plaszczyznach
 #define LCD_NUM_FRONT_PINS 8
@@ -58,6 +53,7 @@ typedef struct timeStruct {
 #define LCD_ERROR_DIGIT_VALUE			0x01
 #define LCD_ERROR_NUMBER					0x02
 
+#define LCD_DIABLED_MSG	0xD15A //prawie jak "DISAbled"
 
 //inicjalizacja odpowiednich rejestrow
 void initLCD(void);
@@ -70,9 +66,12 @@ void setDigitLCD( uint8_t digit, uint8_t position );
 	//jezeli base ma bit 1, oznacza to, ze nieznaczace zera maja byc wyczyszczone
 void setNumberLCD( uint32_t number, uint8_t base );
 
-//wyswietlanie i inkrementacja czasu (docelowo wywolywane przez RTC_Seconds_IRQHandler)
+//wyswietlanie czasu
 	//miganie dwukropka odbywa sie poza ta funkcja
-void setTimeLCD( timeStruct *time );
+void setTimeLCD( volatile timeStruct time );
+
+//wyswietlanie czasu do debugowania w formacie mm:ss
+void setTimeSecondsLCD( volatile timeStruct time );
 
 //wyswietlenie informacji o bledzie
 void errorLCD( uint8_t code );

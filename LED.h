@@ -2,6 +2,7 @@
 #define LED_h
 
 #include "MKL46Z4.h"
+#include "globals.h"
 
 //zgodnie z User Manual Red jest na PTD5, a Green na PTE29
 #define LED_PIN_RED			5u

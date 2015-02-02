@@ -423,6 +423,31 @@
               <FileType>1</FileType>
               <FilePath>.\LCD.c</FilePath>
             </File>
+            <File>
+              <FileName>VLPS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\VLPS.c</FilePath>
+            </File>
+            <File>
+              <FileName>TPM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\TPM.c</FilePath>
+            </File>
+            <File>
+              <FileName>SW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SW.c</FilePath>
+            </File>
+            <File>
+              <FileName>BUZZ.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\BUZZ.c</FilePath>
+            </File>
+            <File>
+              <FileName>TSI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\TSI.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
