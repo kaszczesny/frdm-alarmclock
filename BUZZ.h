@@ -12,26 +12,26 @@
 #define MAX_BUZZ_TIME     7u //60*5
 
 /** inicjalizacja odpowiednich rejestrow (TPM1 - do generowania fali 2kHz)
- *		
- *		  start:
- *		  -wylacz drugi alarm, jest jest wlaczony, \
- *		  -wyjdz z menu i ignoruj buttony           \
- *		  -wyswietlaj godzine, ale nie spij          \
- *		  -wlacz TPM1 i ACC                           \
- *	(RED)    |                                       \
+ *    
+ *      start:
+ *      -wylacz drugi alarm, jest jest wlaczony, \
+ *      -wyjdz z menu i ignoruj buttony           \
+ *      -wyswietlaj godzine, ale nie spij          \
+ *      -wlacz TPM1 i ACC                           \
+ *  (RED)    |                                       \
  *  -------->|<----------------                       \
- *  |	       v                |                        \
- *  |	 clear:                 |                         >---|
- *  |	 -wyczysc dane z ACC    |                        /    |
- *  |	    |                   |                       /     |
+ *  |        v                |                        \
+ *  |  clear:                 |                         >---|
+ *  |  -wyczysc dane z ACC    |                        /    |
+ *  |     |                   |                       /     |
  *  |     |                   | (GREEN)              /      |
- *  |	    v                   |                     /       |
- *  |	 acc:                   | (zla suma)         /        |
- *  | 	-zbieraj dane         ^                   /         |
+ *  |     v                   |                     /       |
+ *  |  acc:                   | (zla suma)         /        |
+ *  |   -zbieraj dane         ^                   /         |
  *  |   -sprawdz sume --------|                  /          |
  *  |             |           v                             |
  *  |--------------           |                             |
- *	 (za duza odchylka        |                             |
+ *   (za duza odchylka        |                             |
  *   pojedynczego punktu)     | (dobra suma)                |
  *                            |                             |
  *                            |<-----------------------------

@@ -23,13 +23,6 @@ void initTPM2() {
 	NVIC_ClearPendingIRQ(TPM2_IRQn);
 	NVIC_EnableIRQ(TPM2_IRQn);
 	NVIC_SetPriority (TPM2_IRQn, 0); //najwyzszy priorytet
-
-
-
-
-
-	
-
 }
 
 void TPM2_IRQHandler(void) {

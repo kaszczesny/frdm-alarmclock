@@ -8,19 +8,19 @@
 #include "BUZZ.h"
 
 /** inicjalizacja odpowiednich rejestrow
- *		TPM2 przepelnia sie co 1 sek, ew. budzac procesor i ew. wyswietlajac nowy czas w przerwaniu
+ *    TPM2 przepelnia sie co 1 sek, ew. budzac procesor i ew. wyswietlajac nowy czas w przerwaniu
  *
- *		TPM2 Overflow Interrupt  <--------------------- 1 sek <-------------------------------------
+ *    TPM2 Overflow Interrupt  <--------------------- 1 sek <-------------------------------------
  *        |                                                                                      |
  *        v                                                                                      |
  *    -sprawdz, czy alarm przekroczyl w. krytyczna (zakonczenie 'procesu')                       |
  *    -sprawdz, czy zaczal sie alarm (uruchomienie 'procesu')                                    |
- *		-inkrementuj czas i zamrugaj dwukropkiem																		               |
- *		-jezeli !background (uzytkownik NIE jest w menu), wyswietl nowy czas                       |
- *				|						|																					                                 |
- *				v           ----------------------------------------------------------------------------
+ *    -inkrementuj czas i zamrugaj dwukropkiem                                                   |
+ *    -jezeli !background (uzytkownik NIE jest w menu), wyswietl nowy czas                       |
+ *        |           |                                                                          |
+ *        v           ---------------------------------------------------------------------------|
  *    VLPS (main)                            !display_and_sleep                                  ^
- *        |           (jezeli user jest w menu lub dzwoni alarm, to nie wchodz do VLPS w main)   |
+ *        |            (jezeli user jest w menu lub dzwoni alarm, to nie wchodz do VLPS w main)  |
  *        |                                                                                      |
  *        ----------------------------------------------------------------------------------------
  *

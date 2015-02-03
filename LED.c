@@ -26,11 +26,6 @@ void initLED(void) {
 	offLED( LED_MASK_ALL );
 }
 
-/*
- * magiczna wlasnosc kodu - wedlug mnie w onLED powinno byc PSOR, a w offLED PCOR, ale wtedy nie dziala :(
- * no ale co ja bede dyskutowac z plytka : )
- */
-
 void toggleLED( uint32_t color ) {
 	if( (color & LED_MASK_RED) )
 		PTE->PTOR = LED_MASK_GREEN;

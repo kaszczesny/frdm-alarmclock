@@ -5,11 +5,11 @@
 #include "globals.h"
 #include "SW.h"
 
-#define TSI_PIN_CH2			1u	//PTA1
-#define TSI_PIN_CH3	    2u  //PTA2
+#define TSI_PIN_CH2      1u //PTA1
+#define TSI_PIN_CH3      2u //PTA2
 
-#define TOTAL_ELECTRODE 2u
-#define THRESHOLD			  100u
+#define TOTAL_ELECTRODE  2u
+#define THRESHOLD        100u
 
 #define TSI_FACTOR 1000
 

@@ -1,7 +1,7 @@
 #include "BUZZ.h"
 
-static volatile uint16_t TPM1_N = 0;									//do modulacji
-static volatile int8_t TPM1_direction = 1;						//do modulacji
+static volatile uint16_t TPM1_N = 0;        //do modulacji
+static volatile int8_t TPM1_direction = 1;  //do modulacji
 
 void initBUZZ(void) {
 	SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
