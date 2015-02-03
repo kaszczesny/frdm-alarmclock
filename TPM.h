@@ -23,10 +23,11 @@
  *        |           (jezeli user jest w menu lub dzwoni alarm, to nie wchodz do VLPS w main)   |
  *        |                                                                                      |
  *        ----------------------------------------------------------------------------------------
+ *
  */
 void initTPM2(void);
 
-//uruchamiane po ustawieniu nowego czasu
+//ustawia nowy czas i restartuje TPM2
 void restartTPM2(volatile timeStruct newTime);
 
 #endif

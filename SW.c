@@ -5,9 +5,7 @@ static volatile uint16_t tempN = 0u; //zmienna robocza do ewentualnego wylaczani
 static volatile alarmStruct* whichAlarm = 0; //wskaznik na modyfikowany alarm
 
 void initSW(void) {
-	tempTime.h = 9u;
-	tempTime.m = 0u;
-	tempTime.s = 0u;
+	tempTime = TIME;
 	
 	SIM->SCGC5 |=
 		SIM_SCGC5_PORTA_MASK | //Enable clock for port A
@@ -71,86 +69,68 @@ void handleButton( enum pressedButton button ) {
 		switch( SWITCH_FSM_STATE ) {
 			
 			case FSM_quit: //user wszedl do menu po raz pierwszy
-				SECONDS_FSM_STATE = FSM_background;
 				switch( button ) {
 					
-					case sw3:
+					case sw3: //konfiguruj alarm1
 						whichAlarm = &ALARM1;
 						tempTime = whichAlarm->time;
 						tempN = whichAlarm->n;
-						onLED( LED_MASK_RED );
+						onLED( LED_MASK_RED ); //poinformuj, ze ustawiany jest alarm1
 						SWITCH_FSM_STATE = FSM_alarm_h;
 						break;
 					
-					case sw1:
+					case sw1: //konfiguruj alarm2
 						whichAlarm = &ALARM2;
 						tempTime = whichAlarm->time;
 						tempN = whichAlarm->n;
-						onLED( LED_MASK_GREEN );
+						onLED( LED_MASK_GREEN ); //poinformuj, ze ustawiany jest alarm2
 						SWITCH_FSM_STATE = FSM_alarm_h;
 						break;
 					
-					case sw2:
+					case sw2: //konfiguruj czas
 						tempTime = TIME;
 						tempN = 0;
-						onLED( LED_MASK_ALL );
+						onLED( LED_MASK_ALL ); //poinformuj, ze ustawiany jest czas
 						SWITCH_FSM_STATE = FSM_time_h;
 						break;
+					
+					case tsi: //nie powinno do tego dojsc - slider jest tu wylaczony
+						return;
 				}
+				SECONDS_FSM_STATE = FSM_background;
 				tempTime.s = 0;
 				clearLCD();
 				if( tempN == 0xFFFF )
 					setNumberLCD( LCD_DIABLED_MSG, 16u );
 				else
 					setTimeLCD( tempTime );
-				onDotLCD( LCD_MASK_DOT1 );
+				onDotLCD( LCD_MASK_DOT1 ); //poinformuj, ze konfigurowana jest godzina
 				enableTSI();
 				break;
 				
-			case FSM_alarm_h:
+			case FSM_alarm_h: //konfigurowana jest godzina
 				switch( button ) {
 					
-					case sw1:
+					case sw1: //inkrementacja godziny
 						tempTime.h++;
-						if( tempTime.h == 24 ) {
-							tempN = 0xFFFF;
-							setNumberLCD( LCD_DIABLED_MSG, 16u );
-						}
-						else if( tempTime.h > 24 ) {
-							tempN = 0;
-							tempTime.h = 0;
-							setTimeLCD( tempTime );
-						}
-						else
-							setTimeLCD( tempTime );
+						normalizeHour();
 						break;
 					
-					case sw3:
+					case sw3: //dekrementacja godziny
 						tempTime.h--;
 						if( tempTime.h == 0xFF )
-								tempTime.h = 24; //normalizuj
-						if( tempTime.h == 24 ) {
-							tempN = 0xFFFF;
-							setNumberLCD( LCD_DIABLED_MSG, 16u );
-						}
-						else if( tempTime.h > 24 ) {
-							tempN = 0;
-							tempTime.h = 0;
-							setTimeLCD( tempTime );
-						}
-						else
-							setTimeLCD( tempTime );
+								tempTime.h = 24;
+						normalizeHour();
 						break;
 					
-					case tsi:
+					case tsi: //TODO
 						tempTime.h = (uint8_t)((TSI_VALUE * 23 ) / TSI_FACTOR );
 						setTimeLCD( tempTime );
 						break;
 					
-					//przejdz dalej
-					case sw2:
-						if( tempN == 0xFFFF ) { //wylacz alarm
-							whichAlarm->n = tempN; //ustaw alarm
+					case sw2: //przejdz dalej
+						if( tempN == 0xFFFF ) { //wylacz alarm (bez ingerencji w jego godzine i zakoncz
+							whichAlarm->n = 0xFFFF;
 							SECONDS_FSM_STATE = FSM_reset_display;
 							disableTSI();
 							SWITCH_FSM_STATE = FSM_quit;
@@ -164,60 +144,65 @@ void handleButton( enum pressedButton button ) {
 				}
 				break;
 				
-			case FSM_time_h:
+			case FSM_time_h: //konfigurowana jest godzina
 				switch( button ) {
 					
 					case sw1:
 						tempTime.h++;
-						tempTime.h %= 24;
-						setTimeLCD( tempTime );
+						normalizeHour();
 						break;
 					
 					case sw3:
 						tempTime.h--;
 						if( tempTime.h == 0xFF )
-								tempTime.h = 23;
-						setTimeLCD( tempTime );
+								tempTime.h = 24;
+						normalizeHour();
 						break;
 					
-					case tsi:
+					case tsi: //TODO
 						tempTime.h = (uint8_t)((TSI_VALUE * 23 ) / TSI_FACTOR );
 						setTimeLCD( tempTime );
 						break;
 						
-					//przejdz dalej
-					case sw2:
+					case sw2: //przejdz dalej
+						if( tempN == 0xFFFF ) { //anuluj ustawianie czasu i zakoncz
+							SECONDS_FSM_STATE = FSM_reset_display;
+							disableTSI();
+							SWITCH_FSM_STATE = FSM_quit;
+						}
+						else { //przejdz do minut
+							toggleDotLCD( LCD_MASK_DOT1 | LCD_MASK_DOT3 );
+							SWITCH_FSM_STATE = FSM_time_m;
+						}
 						toggleDotLCD( LCD_MASK_DOT1 | LCD_MASK_DOT3 );
-						SWITCH_FSM_STATE = FSM_time_m;
 						break;
 				}
 				break;
 				
-			case FSM_alarm_m:
+			case FSM_alarm_m: //konfigurowane sa minuty
 				switch( button ) {
 					
 					case sw1:
-						tempTime.m++;
+						tempTime.m++; //inkrementuj minuty
 						tempTime.m %= 60;
 						setTimeLCD( tempTime );
 						break;
 					
 					case sw3:
-						tempTime.m--;
+						tempTime.m--; //dekrementuj minuty
 						if( tempTime.m == 0xFF )
 								tempTime.m = 0;
 						setTimeLCD( tempTime );
 						break;
 					
-					case tsi:
+					case tsi: //TODO
 						tempTime.m = (uint8_t)((TSI_VALUE * 59 ) / TSI_FACTOR );
 						setTimeLCD( tempTime );
 						break;
 						
-					//przejdz dalej
-					case sw2:
-						whichAlarm->time = tempTime; //ustaw alarm
-						whichAlarm->n = 0;
+					case sw2: //ustaw i wyjdz
+						whichAlarm->time = tempTime; //zapisz godzine
+						whichAlarm->n = 0; //aktywuj alarm
 						SECONDS_FSM_STATE = FSM_reset_display;
 						disableTSI();
 						SWITCH_FSM_STATE = FSM_quit;
@@ -225,29 +210,28 @@ void handleButton( enum pressedButton button ) {
 				}
 				break;
 				
-			case FSM_time_m:
+			case FSM_time_m: //konfigurowane sa minuty
 				switch( button ) {
 					
-					case sw1:
+					case sw1: //inkrementuj minuty
 						tempTime.m++;
 						tempTime.m %= 60;
 						setTimeLCD( tempTime );
 						break;
 					
-					case sw3:
+					case sw3: //dekrementuj minuty
 						tempTime.m--;
 						if( tempTime.m == 0xFF )
 								tempTime.m = 59;
 						setTimeLCD( tempTime );
 						break;
 					
-					case tsi:
+					case tsi: //TODO
 						tempTime.m = (uint8_t)((TSI_VALUE * 59 ) / TSI_FACTOR );
 						setTimeLCD( tempTime );
 						break;
 						
-					//przejdz dalej
-					case sw2:
+					case sw2: //przejdz dalej
 						SWITCH_FSM_STATE = FSM_quit;
 						restartTPM2( tempTime );
 						disableTSI();
@@ -260,9 +244,11 @@ void handleButton( enum pressedButton button ) {
 
 void disableSW(void) {
 	// 0000 -> interrupt request disabled
-	PORTC->PCR[SW_PIN_SW1] |= PORT_PCR_IRQC(0u);
-	PORTC->PCR[SW_PIN_SW3] |=	PORT_PCR_IRQC(0u);
-	PORTA->PCR[SW_PIN_SW2] |=	PORT_PCR_IRQC(0u);
+	PORTC->PCR[SW_PIN_SW1] &= ~PORT_PCR_IRQC_MASK;
+	PORTC->PCR[SW_PIN_SW3] &= ~PORT_PCR_IRQC_MASK;
+	PORTA->PCR[SW_PIN_SW2] &= ~PORT_PCR_IRQC_MASK;
+	disableTSI();
+	SWITCH_FSM_STATE = FSM_quit;
 }
 
 void enableSW(void) {
@@ -270,4 +256,20 @@ void enableSW(void) {
 	PORTC->PCR[SW_PIN_SW1] |= PORT_PCR_IRQC(9u);
 	PORTC->PCR[SW_PIN_SW3] |=	PORT_PCR_IRQC(9u);
 	PORTA->PCR[SW_PIN_SW2] |=	PORT_PCR_IRQC(9u);
+}
+
+void normalizeHour(void) {
+	if( tempTime.h == 24 ) { //specjalna wartosc
+		tempN = 0xFFFF;
+		setNumberLCD( LCD_DIABLED_MSG, 16u );
+	}
+	else if( tempTime.h > 24 ) { //'zawijaj' z powrotem do zera
+		tempN = 0;
+		tempTime.h = 0;
+		setTimeLCD( tempTime );
+	}
+	else {
+		tempN = 0;
+		setTimeLCD( tempTime );
+	}
 }

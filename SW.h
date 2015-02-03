@@ -22,7 +22,7 @@ enum pressedButton {
 	tsi
 };
 
-//ponizszy algorytm - zeby nie rozbijac na 2 przerwania
+//ponizszy algorytm - zeby nie rozbijac na kilka przerwan
 void handleButton( enum pressedButton button );
 
 /** inicjalizacja odpowiednich rejestrow
@@ -39,12 +39,12 @@ void handleButton( enum pressedButton button );
  *		      v              v           v
  *		config alarm1  config alarm2     config czasu
  *		      |              |           |
- *	------->--|-------------<-----------
- *	|	        |                        
- *	|	        v
+ *	------->------>|<-------<-----------
+ *	|	             |                        
+ *	|	             v
  *	| 	-SW3: dekrementuj godziny
  *	|	  -SW1: inkrementuj godziny
- *	|	  -dla alarmu: specjalna wartosc przed 0, ktora go dezaktywuje
+ *	|	  -specjalna wartosc przed 0, ktora dezaktywuje alarm lub anuluje ustawianie czasu
  *	--	-slider: ustaw godzine
  *      -wyswietl ustawienie
  *		  -SW2: przejdz do minut -------|
@@ -65,25 +65,21 @@ void handleButton( enum pressedButton button );
  *		                                      v
  *		     -odblokuj wyswietlanie czasu i VLPS
  *		     -ustaw nowy czas
- *		     -wlacz TPM2
+ *		     -wlacz na nowo TPM2
  *		     -wyjscie z menu
  *		
- *		
- *		
- *		
- *		
- *		
- *		
- *		
- *		
- *		
+ *		Ta FSM implementuje menu. Wszystkie zmiany odbywaja sie na zmiennych tymczasowych
+ *		(mozna brutalnie opuscic menu i konfiguracja zostanie anulowana)
  */
 void initSW(void);
 
-//wylaczenie przerwan na pinach SW1 i SW3 (dla alarmu) oraz anulowanie menu
+//wylaczenie przerwan na pinach SW1-3 (dla alarmu) oraz anulowanie menu
 void disableSW(void);
 
-//wlaczenie przerwan na pinach SW1 i SW3 (dla alarmu)
+//wlaczenie przerwan na pinach SW-3 (dla alarmu)
 void enableSW(void);
+
+//wewnetrzna funkcja, ktora realizuje 'zawijanie' godzin
+void normalizeHour(void);
 
 #endif

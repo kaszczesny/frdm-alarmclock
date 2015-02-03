@@ -18,15 +18,16 @@ volatile enum switchFSM SWITCH_FSM_STATE = FSM_time_h;
 volatile uint8_t TSI_VALUE = 0;
 volatile uint8_t END_FLAG = 1;
 
+//bo ten kompilator nie obsluguje inicjalizacji struktur
 void initGlobals(void) {
 	TIME.h = 9u;
 	TIME.m = 0u;
 	TIME.s = 0u;
 	
 	ALARM1.time.h = 9u;
-	ALARM1.time.m = 15u;
-	ALARM1.time.s = 0u;
-	ALARM1.n = 0xFFFF;
+	ALARM1.time.m = 0;//15u;
+	ALARM1.time.s = 3;//0u;
+	ALARM1.n = 0;//0xFFFF;
 	ALARM1.state = FSM_quiet;
 	
 	ALARM2.time.h = 9u;
