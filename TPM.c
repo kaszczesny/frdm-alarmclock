@@ -16,7 +16,7 @@ void initTPM2() {
 	TPM2->SC |= TPM_SC_PS( 7 ); // 111 -> Divide by 128
 	
 	TPM2->CNT = 0x00; //clear counter
-	TPM2->MOD = 15625 + 260 - 43 + (10+4+2-1-5); //CPU_INT_FAST_CLK_HZ/128 + 1/60 - 1/6 + C
+	TPM2->MOD = TPM2_ONE_SECOND;
 	
 	TPM2->SC |= TPM_SC_TOIE_MASK; //Enable TOF interrupts. An interrupt is generated when TOF equals one.
 	
@@ -33,14 +33,14 @@ void TPM2_IRQHandler(void) {
 	//sprawdzanie wartoci krytycznej
 	if( ALARM1.state != FSM_quiet ) {
 		ALARM1.n++;
-		if( ALARM1.n > MAX_BUZZ_TIME ) {
+		if( ALARM1.n > BUZZ_MAX_TIME ) {
 			ALARM1.state = FSM_terminate;
 			doAlarmFSM( &ALARM1 );
 		}
 	}
 	if( ALARM2.state != FSM_quiet ) {
 		ALARM2.n++;
-		if( ALARM2.n > MAX_BUZZ_TIME ) {
+		if( ALARM2.n > BUZZ_MAX_TIME ) {
 			ALARM2.state = FSM_terminate;
 			doAlarmFSM( &ALARM2 );
 		}

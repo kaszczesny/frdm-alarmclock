@@ -7,6 +7,8 @@
 #include "SW.h"
 #include "BUZZ.h"
 #include "TSI.h"
+#include "I2C.h"
+#include "ACC.h"
 
 volatile timeStruct TIME;
 volatile alarmStruct ALARM1;
@@ -26,7 +28,7 @@ void initGlobals(void) {
 	
 	ALARM1.time.h = 9u;
 	ALARM1.time.m = 0;//15u;
-	ALARM1.time.s = 3;//0u;
+	ALARM1.time.s = 5;//0u;
 	ALARM1.n = 0;//0xFFFF;
 	ALARM1.state = FSM_quiet;
 	
@@ -38,7 +40,7 @@ void initGlobals(void) {
 	
 }
 
-int main(void){volatile uint32_t i;
+int main(void){//volatile int i;int16_t z,max=0;
 	initGlobals();
 	
 	initLCD();
@@ -47,6 +49,7 @@ int main(void){volatile uint32_t i;
 	initSW();
 	initTPM2();
 	initBUZZ();
+	initI2C0();
 	//initTSI();
 	
 	/*SWITCH_FSM_STATE = FSM_quit;
@@ -70,10 +73,48 @@ int main(void){volatile uint32_t i;
 	//czekamy az user ustawi czas
 	while( SWITCH_FSM_STATE != FSM_quit );
 	
-	
+	/*enableACC();
+	SECONDS_FSM_STATE = FSM_background;
+	offDotLCD(LCD_MASK_DOT3);
+	offLED(LED_MASK_ALL);*/
 	while(1) {
 		if( SECONDS_FSM_STATE == FSM_display_and_sleep ) {
 			enterVLPS();
 		}
+//		z = getVectorACC();//readAxisValue(Z);
+//		//z = z < 0 ? z*(-1) : z;
+//		/*setNumberLCD( z , 10u );
+//		for(i=0;i<=10000;i++);
+//		toggleLED(LED_MASK_RED);
+//		setNumberLCD( (uint32_t) z , 11u );
+//		for(i=0;i<=10000;i++);*/
+//		//toggleLED(LED_MASK_GREEN);
+//		//for(i=0;i<=10000;i++);
+//		for(i=0;i<=100000;i++);
+//			
+//		//t = getVectorACC();
+//		//sum += t;
+//		if( z > max )
+//			max = z;
+//		/*if( k % 25 == 0 ) {
+//			setNumberLCD( max , 10u );
+//			onLED(LED_MASK_RED);
+//			for(i=0;i<=600000;i++);
+//			offLED(LED_MASK_RED);
+//		}
+//		else {*/
+//		setNumberLCD( max , 10u );
+//			
+//		/*}
+//		k++;
+//		if( k == 25*10 ) {
+//			setNumberLCD( sum/k , 11u );
+//			sum=0;
+//			max = 0;
+//			k = 0;
+//			onLED(LED_MASK_GREEN);
+//			for(i=0;i<=6000000;i++);
+//			offLED(LED_MASK_GREEN);
+//		}*/
 	}
 }

@@ -35,7 +35,7 @@ enum alarmFSM {
 typedef struct alarmStruct {
 	volatile timeStruct time;  //czas alarmu
 	uint16_t n;                //od ilu sekund dzwoni lub czy jest w ogole wylaczony (0xFFFF)
-	int32_t sum;               //dane z akcelerometru
+	uint32_t sum;               //dane z akcelerometru
 	int16_t N;                 //liczba danych z akcelerometru (do liczenia sredniej)
 	enum alarmFSM state;       //stan FSM - kazy alarm ma osobna
 } alarmStruct;

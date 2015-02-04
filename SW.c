@@ -174,7 +174,6 @@ void handleButton( enum pressedButton button ) {
 							toggleDotLCD( LCD_MASK_DOT1 | LCD_MASK_DOT3 );
 							SWITCH_FSM_STATE = FSM_time_m;
 						}
-						toggleDotLCD( LCD_MASK_DOT1 | LCD_MASK_DOT3 );
 						break;
 				}
 				break;
@@ -191,7 +190,7 @@ void handleButton( enum pressedButton button ) {
 					case sw3:
 						tempTime.m--; //dekrementuj minuty
 						if( tempTime.m == 0xFF )
-								tempTime.m = 0;
+								tempTime.m = 59;
 						setTimeLCD( tempTime );
 						break;
 					
