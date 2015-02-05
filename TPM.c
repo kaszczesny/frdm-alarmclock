@@ -26,16 +26,14 @@ void initTPM2() {
 }
 
 void TPM2_IRQHandler(void) {
-	//TSI0->DATA |= TSI_DATA_SWTS_MASK;
-	//TPM2->STATUS & TPM_STATUS_TOF_MASK - timer overflow
-		//(nie ma kanalow, wiec to jest oczywiste)
 	
-	//sprawdzanie wartoci krytycznej
+	//sprawdzanie wartosci krytycznej
 	if( ALARM1.state != FSM_quiet ) {
 		ALARM1.n++;
 		if( ALARM1.n > BUZZ_MAX_TIME ) {
 			ALARM1.state = FSM_terminate;
 			doAlarmFSM( &ALARM1 );
+			enableSW(); //na wszelki wypadek
 		}
 	}
 	if( ALARM2.state != FSM_quiet ) {
@@ -43,15 +41,16 @@ void TPM2_IRQHandler(void) {
 		if( ALARM2.n > BUZZ_MAX_TIME ) {
 			ALARM2.state = FSM_terminate;
 			doAlarmFSM( &ALARM2 );
+			enableSW(); //na wszelki wypadek
 		}
 	}
 	
-	//wlaczenie alarmu
-	if( TIME.h == ALARM1.time.h && TIME.m == ALARM1.time.m && TIME.s == ALARM1.time.s ) {
+	//wlaczenie alarmu, jesli jest aktywny
+	if( TIME.h == ALARM1.time.h && TIME.m == ALARM1.time.m && TIME.s == ALARM1.time.s && ALARM1.n != 0xFFFF ) {
 		ALARM1.state = FSM_start;
 		doAlarmFSM( &ALARM1 );
 	}
-	else if( TIME.h == ALARM2.time.h && TIME.m == ALARM2.time.m && TIME.s == ALARM2.time.s ) {
+	else if( TIME.h == ALARM2.time.h && TIME.m == ALARM2.time.m && TIME.s == ALARM2.time.s && ALARM2.n != 0xFFFF ) {
 		ALARM2.state = FSM_start;
 		doAlarmFSM( &ALARM2 );
 	}
@@ -74,8 +73,8 @@ void TPM2_IRQHandler(void) {
 		//wyswietl nowy czas
 		case FSM_display_and_sleep:
 		case FSM_display:
-			//setTimeLCD( TIME );
-			setTimeSecondsLCD( TIME ); //debug
+			setTimeLCD( TIME );
+			//setTimeSecondsLCD( TIME ); //debug
 			break;
 			
 		case FSM_background:
@@ -88,8 +87,8 @@ void TPM2_IRQHandler(void) {
 				onDotLCD( LCD_MASK_DOT1 ); //poinformuj, ze alarm1 jest aktywny
 			if( ALARM2.n != 0xFFFF )
 				onDotLCD( LCD_MASK_DOT3 ); //poinformuj, ze alarm2 jest aktywny
-			//setTimeLCD( TIME );
-			setTimeSecondsLCD( TIME ); //debug
+			setTimeLCD( TIME );
+			//setTimeSecondsLCD( TIME ); //debug
 			SECONDS_FSM_STATE = FSM_display_and_sleep;
 			break;
 	}

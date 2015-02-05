@@ -6,7 +6,7 @@ static uint16_t BASELINE[16];
 static uint16_t DELTA[16];
 
 void initTSI(void) {
-	SIM->SCGC5 |=
+	/*SIM->SCGC5 |=
 		SIM_SCGC5_PORTA_MASK |
 		SIM_SCGC5_TSI_MASK;  // Enable clock gating for TSI
 	
@@ -32,7 +32,7 @@ void initTSI(void) {
 	
 	enableTSI();
 	
-	calibrationTSI();
+	calibrationTSI();*/
 }
 
 void TSI0_IRQHandler(void) {

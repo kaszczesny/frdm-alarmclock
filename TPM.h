@@ -7,7 +7,7 @@
 #include "LCD.h"
 #include "BUZZ.h"
 
-#define TPM2_ONE_SECOND  ( 15625 + 260 - 43 + (10+4+2-1-5-2) ) //CPU_INT_FAST_CLK_HZ/128 + 1/60 - 1/6 + C
+#define TPM2_ONE_SECOND  ( 15625 + 260 - 43 + (10+4+2-1-5-2+4) ) //CPU_INT_FAST_CLK_HZ/128 + 1/60 - 1/6 + C
 
 /** inicjalizacja odpowiednich rejestrow
  *    TPM2 przepelnia sie co 1 sek, ew. budzac procesor i ew. wyswietlajac nowy czas w przerwaniu

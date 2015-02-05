@@ -1,7 +1,9 @@
 #include "BUZZ.h"
 
-static volatile uint16_t TPM1_N = 0;        //do modulacji
-static volatile int8_t TPM1_direction = 1;  //do modulacji
+static volatile uint16_t TPM1_N = 0;          //do modulacji - zeby zmieniac czestotliwosc odpowiednio rzadko
+static volatile int8_t TPM1_direction = -1;   //do modulacji - zeby chodzic po czestotliwosciach gora-dol-gora...
+
+static volatile uint8_t consecutive_failures; //ile razy pod rzad przyspieszenie nie przekroczylo BUZZ_THRESHOLD_ACC
 
 void initBUZZ(void) {
 	SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
@@ -18,13 +20,13 @@ void initBUZZ(void) {
 	TPM1->SC |= TPM_SC_TOIE_MASK; //overflow interrupt
 	
 	TPM1->CNT = 0x00; //clear counter
-	TPM1->MOD = BUZZ_DEFAULT_MOD;
+	TPM1->MOD = BUZZ_MAX_MOD;
 	
 	TPM1->CONTROLS[0].CnSC = 	//output compare - toggle output on match
 		TPM_CnSC_MSA_MASK |
 		TPM_CnSC_ELSA_MASK;
 		
-	TPM1->CONTROLS[0].CnV = BUZZ_DEFAULT_MOD;
+	TPM1->CONTROLS[0].CnV = BUZZ_MAX_MOD;
 	
 	NVIC_ClearPendingIRQ(TPM1_IRQn);
 	NVIC_EnableIRQ(TPM1_IRQn);
@@ -35,12 +37,12 @@ void initBUZZ(void) {
 	SIM->SCGC6 |= SIM_SCGC6_TPM0_MASK;
 
 	TPM0->SC &= ~TPM_SC_CPWMS_MASK; //TPM counter operates in up counting mode
-	TPM0->SC |= TPM_SC_PS( 4 ); // 100 -> Divide by 16
+	TPM0->SC |= TPM_SC_PS( 7 ); // 111 -> Divide by 128
 	
 	TPM0->SC |= TPM_SC_TOIE_MASK; //overflow interrupt
 	
 	TPM0->CNT = 0x00; //clear counter
-	TPM0->MOD = TPM2_ONE_SECOND * (128/16) / BUZZ_STEP_FREQ;
+	TPM0->MOD = TPM2_ONE_SECOND / BUZZ_STEP_FREQ;
 	
 	
 	NVIC_ClearPendingIRQ(TPM0_IRQn);
@@ -55,19 +57,23 @@ void TPM0_IRQHandler(void) {
 	TPM0->STATUS |= TPM_STATUS_TOF_MASK; //clear interrupt flag
 }
 
-void TPM1_IRQHandler(void) {
+void TPM1_IRQHandler(void) { //proba jakiejs modulacji
 	uint16_t mod = TPM1->MOD;
 	TPM1_N++;
-	if( TPM1_N % 40 == 0 && mod > 500 ) { //proba jakiejs modulacji
-		//mod = TPM1->MOD;
-		//TPM1->SC &= ~TPM_SC_CMOD_MASK;
-		//TPM1->CNT = 0;
-		TPM1->MOD = mod - 1;
-		TPM1->CONTROLS[0].CnV = mod - 1;
-		//TPM1->SC |= TPM_SC_CMOD(1);
+	if( mod <= BUZZ_MIN_MOD )
+		TPM1_direction = 1;
+	if( mod >= BUZZ_MAX_MOD  )
+		TPM1_direction = -1;
+	if( TPM1_N % BUZZ_MOD_DELAY == 0 ) {
+		
+		if( TPM1_direction < 0 )
+				mod -= BUZZ_MOD_STEP;
+		else
+				mod += BUZZ_MOD_STEP;
+		TPM1->MOD = mod;
+		TPM1->CONTROLS[0].CnV = mod;
+		
 	}
-	setNumberLCD( mod, 11u );
-	offDotLCD( LCD_MASK_DOT_ALL );
 	TPM1->STATUS |= TPM_STATUS_TOF_MASK; //clear interrupt flag
 }
 
@@ -96,7 +102,7 @@ void doAlarmFSM( volatile alarmStruct* alarm ) {
 			else {
 				SWITCH_FSM_STATE = FSM_quit;
 				disableSW();
-				SECONDS_FSM_STATE = FSM_background;//FSM_display; - debug do modulacji
+				SECONDS_FSM_STATE = FSM_display;
 				offLED( LED_MASK_ALL );
 				startTPM1();
 				enableACC();
@@ -109,22 +115,28 @@ void doAlarmFSM( volatile alarmStruct* alarm ) {
 			alarm->N = 0;
 			alarm->sum = 0;
 			alarm->state = FSM_acc;
+			consecutive_failures = 0;
+			offLED(LED_MASK_RED); //RED swieci sie tylko podczas liczacego sie ruchu
 			break;
 		
 		case FSM_acc: //zbieraj dane z akcelerometru
+			alarm->N++;	//do sredniej ida zerowe 'probki', gdy ponizszy if jest spelniony
+			
 			v = getVectorACC();
+
 			if( v < BUZZ_THRESHOLD_ACC ) {
-				alarm->state = FSM_clear;
-				if( v > 650 ) //nie ma sensu swiecic, jezeli plytka lezy
-					onLED( LED_MASK_RED );
+				consecutive_failures++;
+				if( consecutive_failures >= BUZZ_MAX_FAILRUES )
+					alarm->state = FSM_clear;
 				return;
 			}
 			
-			alarm->N++;
+			consecutive_failures = 0;
 			alarm->sum += v;
-			
+			onLED( LED_MASK_RED );
+						
 			if( alarm->N == BUZZ_HIGHLIGHT_TICKS )
-				offLED( LED_MASK_ALL );
+				offLED( LED_MASK_GREEN );
 			
 			if( alarm->N >= BUZZ_REQUIRED_TICS ) {
 				if( (alarm->sum / alarm->N) >= BUZZ_MIN_AVG )
@@ -153,10 +165,10 @@ void doAlarmFSM( volatile alarmStruct* alarm ) {
 
 void startTPM1(void) {
 	TPM1->CNT = 0x00;
-	TPM1->MOD = BUZZ_DEFAULT_MOD;
+	TPM1->MOD = BUZZ_MAX_MOD;
 	
 	TPM1_N = 0;
-	TPM1_direction = 1;
+	TPM1_direction = -1;
 	
 	TPM1->SC |= TPM_SC_CMOD(1);
 }

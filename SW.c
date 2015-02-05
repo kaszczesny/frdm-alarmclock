@@ -255,6 +255,7 @@ void enableSW(void) {
 	PORTC->PCR[SW_PIN_SW1] |= PORT_PCR_IRQC(9u);
 	PORTC->PCR[SW_PIN_SW3] |=	PORT_PCR_IRQC(9u);
 	PORTA->PCR[SW_PIN_SW2] |=	PORT_PCR_IRQC(9u);
+	SWITCH_FSM_STATE = FSM_quit;
 }
 
 void normalizeHour(void) {

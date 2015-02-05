@@ -448,6 +448,16 @@
               <FileType>1</FileType>
               <FilePath>.\TSI.c</FilePath>
             </File>
+            <File>
+              <FileName>ACC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ACC.c</FilePath>
+            </File>
+            <File>
+              <FileName>I2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\I2C.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
